@@ -13,9 +13,8 @@
 # limitations under the License.
 
 import casbin
-from flask import abort
 from werkzeug.wrappers import Request
-from werkzeug.exceptions import HTTPException, default_exceptions,  Aborter
+from werkzeug.exceptions import Unauthorized
 
 
 class CasbinMiddleware:
@@ -31,7 +30,7 @@ class CasbinMiddleware:
         # Check the permission for each request.
         if not self.check_permission(request):
             # Not authorized, return HTTP 403 error.
-            self.require_permission()
+            return Unauthorized()(environ, start_response)
 
         # Permission passed, go to next module.
         return self.app(environ, start_response)
@@ -44,7 +43,3 @@ class CasbinMiddleware:
         path = request.path
         method = request.method
         return self.enforcer.enforce(user, path, method)
-
-
-    def require_permission(self,):
-        abort(403)
