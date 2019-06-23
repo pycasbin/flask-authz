@@ -1,48 +1,40 @@
-# flask-casbin
+# flask-authz
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
-flask-casbin is an authorization middleware for [Flask](http://flask.pocoo.org/), it's based on [PyCasbin](https://github.com/casbin/pycasbin).
+flask-authz is an authorization middleware for [Flask](http://flask.pocoo.org/), it's based on [PyCasbin](https://github.com/casbin/pycasbin).
 
 ## Installation
 
 ```
-pip install flask-casbin
+pip install flask-authz
 ```
 
 ## Simple Example
 
-This repo is just a working Flask app that shows the usage of flask-casbin. To use it in your existing Flask app, you need:
-
-- Add the middleware to your Django app's ``settings.py``:
+This repo is just a working Flask app that shows the usage of flask-authz. To use it in your existing Flask app, you need:
 
 ```python
+from authz.middleware import CasbinMiddleware
+import casbin
 from flask import Flask
-from casbin_middleware.middleware import CasbinMiddleware
 
 app = Flask(__name__)
-app.wsgi_app = CasbinMiddleware(app.wsgi_app) # Add this line, must after Authentication.
-```
 
-- Copy ``casbin_middleware`` folder to your Flask app's top folder, modify ``casbin_middleware/middleware.py`` if you need:
+# Initialize the Casbin enforcer, load the casbin model and policy from files.
+# Change the 2nd arg to use a database.
+enforcer = casbin.Enforcer("authz_model.conf", "authz_policy.csv")
 
-```python
-import casbin
+app.wsgi_app = CasbinMiddleware(app.wsgi_app, enforcer)
 
-    def __init__(self, app):
-        self.app = app
-        # load the casbin model and policy from files.
-        # change the 2nd arg to use a database.
-        self.enforcer = casbin.Enforcer("casbin_middleware/authz_model.conf", "casbin_middleware/authz_policy.csv")
 
-    def check_permission(self, request):
-        # change the user, path, method as you need.
-        user = request.remote_user
-        if user is None:
-            user = 'anonymous'
-        path = request.path
-        method = request.method
-        return self.enforcer.enforce(user, path, method)
+@app.route("/")
+def hello_world():
+    return "Hello World!"
+
+
+if __name__ == '__main__':
+    app.run()
 ```
 
 - The default policy ``authz_policy.csv`` is:
@@ -54,6 +46,23 @@ g, alice, admin
 ```
 
 It means ``anonymous`` user can only access homepage ``/``. Admin users like alice can access any pages. Currently all accesses are regarded as ``anonymous``. Add your authentication to let a user log in.
+
+## How are subject, object, action defined?
+
+In ``middleware.py``:
+
+```python
+def check_permission(self, request):
+    # change the user, path, method as you need.
+    user = request.remote_user # subject
+    if user is None:
+        user = 'anonymous'
+    path = request.path # object
+    method = request.method # action
+    return self.enforcer.enforce(user, path, method)
+```
+
+You may need to copy the ``middleware.py`` code to your project and modify it directly if you have other definitions for subject, object, action.
 
 ## Documentation
 

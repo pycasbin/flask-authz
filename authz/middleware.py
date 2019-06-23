@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import casbin
 from werkzeug.wrappers import Request
 from werkzeug.exceptions import Unauthorized
 
 
 class CasbinMiddleware:
-    def __init__(self, app):
+    def __init__(self, app, enforcer):
         self.app = app
-        # Initialize the Casbin enforcer, executed only on once.
-        self.enforcer = casbin.Enforcer("casbin_middleware/authz_model.conf", "casbin_middleware/authz_policy.csv")
+        self.enforcer = enforcer
 
     def __call__(self, environ, start_response):
         # not Flask request - from werkzeug.wrappers import Request
