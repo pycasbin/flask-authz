@@ -1,5 +1,10 @@
 # flask-authz
 
+[![Build Status](https://www.travis-ci.org/pycasbin/flask-authz.svg?branch=master)](https://www.travis-ci.org/pycasbin/flask-authz)
+[![Version](https://img.shields.io/pypi/v/flask-authz.svg)](https://pypi.org/project/flask-authz/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/flask-authz.svg)](https://pypi.org/project/flask-authz/)
+[![Pyversions](https://img.shields.io/pypi/pyversions/flask-authz.svg)](https://pypi.org/project/flask-authz/)
+[![Download](https://img.shields.io/pypi/dm/flask-authz.svg)](https://pypi.org/project/flask-authz/)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/casbin/lobby)
 
 flask-authz is an authorization middleware for [Flask](http://flask.pocoo.org/), it's based on [PyCasbin](https://github.com/casbin/pycasbin).
