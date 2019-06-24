@@ -15,12 +15,19 @@
 from authz.middleware import CasbinMiddleware
 import casbin
 from flask import Flask
+import os
 import unittest
 
 app = Flask(__name__)
 
+
+def get_example_file(path):
+    examples_path = os.path.split(os.path.realpath(__file__))[0] + "/../tests/"
+    return os.path.abspath(examples_path + path)
+
+
 # Initialize the Casbin enforcer, executed only on once.
-e = casbin.Enforcer('authz_model.conf', 'authz_policy.csv')
+e = casbin.Enforcer(get_example_file('authz_model.conf'), get_example_file('authz_policy.csv'))
 
 app.wsgi_app = CasbinMiddleware(app.wsgi_app, e)
 
