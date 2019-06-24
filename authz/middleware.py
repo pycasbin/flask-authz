@@ -13,7 +13,7 @@
 # limitations under the License.
 
 from werkzeug.wrappers import Request
-from werkzeug.exceptions import Unauthorized
+from werkzeug.exceptions import Forbidden
 
 
 class CasbinMiddleware:
@@ -28,7 +28,7 @@ class CasbinMiddleware:
         # Check the permission for each request.
         if not self.check_permission(request):
             # Not authorized, return HTTP 403 error.
-            return Unauthorized()(environ, start_response)
+            return Forbidden()(environ, start_response)
 
         # Permission passed, go to next module.
         return self.app(environ, start_response)
