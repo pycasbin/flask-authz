@@ -29,14 +29,23 @@ class CasbinEnforcer:
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Check sub, obj act against Casbin polices
+            self.app.logger.debug(
+                "Enforce Headers Config: %s\nRequest Headers: %s" % (
+                    self.app.config.get('CASBIN_OWNER_HEADERS'),
+                    request.headers
+                )
+            )
             for header in self.app.config.get('CASBIN_OWNER_HEADERS'):
                 if request.headers.has_key(header):
                     for owner in request.headers.getlist(header):
                         self.app.logger.debug(
-                            "Enforce against owner: %s header: %s" % (owner, header)
+                            "Enforce against owner: %s header: %s" % (
+                                owner.strip('"'),
+                                header
+                            )
                         )
                         if self.e.enforce(
-                            owner,
+                            owner.strip('"'),
                             str(request.url_rule),
                             request.method
                         ):
