@@ -1,8 +1,7 @@
-# Dev/Deployment
 sphinx
 sphinx_rtd_theme
 pytest
 pytest-cov
-pytest-mock
+casbin_sqlalchemy_adapter
 coverage
 pypi-publisher
