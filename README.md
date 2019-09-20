@@ -32,14 +32,14 @@ casbin_enforcer = CasbinEnforcer(app, adapter)
 @casbin_enforcer.enforcer
 def get_root():
     return jsonify({'message': 'If you see this you have access'})
+
+@app.route('/manager', methods=['POST'])
+@casbin_enforcer.enforcer
+@casbin_enforcer.manager
+def make_casbin_change(manager):
+    # Manager is an casbin.enforcer.Enforcer object to make changes to Casbin
+    return jsonify({'message': 'If you see this you have access'})
 ```
     
-Contributing
-------------
 
-TBD
 
-Example
--------
-
-TBD
