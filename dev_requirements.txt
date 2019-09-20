@@ -1,3 +1,4 @@
+pre-commit
 black
 sphinx
 sphinx_rtd_theme
