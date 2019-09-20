@@ -40,6 +40,22 @@ def make_casbin_change(manager):
     # Manager is an casbin.enforcer.Enforcer object to make changes to Casbin
     return jsonify({'message': 'If you see this you have access'})
 ```
-    
+
+Development
+------------
+1. Fork
+2. Install Dev ENV
+```python
+# Install Flask-Casbin with Dev packages
+pip install -r dev_requirements.txt
+pip install -r requirements.txt
+pip install -e .
+# Install Pre-commits
+pre-commit install
+# Create feature branch
+git checkout -b feature-more-cool-stuff
+# Code stuff
+```
+Then push your changes and create a PR
 
 
