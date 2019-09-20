@@ -7,3 +7,4 @@ pytest-cov
 casbin_sqlalchemy_adapter
 coverage
 pypi-publisher
+bumpversion

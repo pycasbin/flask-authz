@@ -58,4 +58,13 @@ git checkout -b feature-more-cool-stuff
 ```
 Then push your changes and create a PR
 
+#### Manually Bump Version
+```
+bumpversion major  # major release
+or
+bumpversion minor  # minor release
+or
+bumpversion patch  # hotfix release
+```
+
 
