@@ -4,6 +4,8 @@ import casbin
 from flask import request, jsonify
 from functools import wraps
 
+from flask_casbin.utils import authorization_decoder, UnSupportedAuthType
+
 
 class CasbinEnforcer:
     """
@@ -35,16 +37,32 @@ class CasbinEnforcer:
                 % (self.app.config.get("CASBIN_OWNER_HEADERS"), request.headers)
             )
             for header in self.app.config.get("CASBIN_OWNER_HEADERS"):
-                if request.headers.has_key(header):
-                    for owner in request.headers.getlist(header):
-                        self.app.logger.debug(
-                            "Enforce against owner: %s header: %s"
-                            % (owner.strip('"'), header)
-                        )
-                        if self.e.enforce(
-                            owner.strip('"'), str(request.url_rule), request.method
-                        ):
+                if header in request.headers:
+                    # Make Authorization Header Parser standard
+                    if header == "Authorization":
+                        # Get Auth Value then decode and parse for owner
+                        try:
+                            owner = authorization_decoder(request.headers.get(header))
+                        except UnSupportedAuthType:
+                            # Continue if catch unsupported type in the event of
+                            # Other headers needing to be checked
+                            self.app.logger.info(
+                                "Authorization header type requested for "
+                                "decoding is unsupported by flask-casbin at this time"
+                            )
+                            continue
+                        if self.e.enforce(owner, str(request.url_rule), request.method):
                             return func(*args, **kwargs)
+                    else:
+                        for owner in request.headers.getlist(header):
+                            self.app.logger.debug(
+                                "Enforce against owner: %s header: %s"
+                                % (owner.strip('"'), header)
+                            )
+                            if self.e.enforce(
+                                owner.strip('"'), str(request.url_rule), request.method
+                            ):
+                                return func(*args, **kwargs)
             else:
                 return (jsonify({"message": "Unauthorized"}), 401)
 
