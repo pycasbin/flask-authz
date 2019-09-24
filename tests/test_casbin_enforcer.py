@@ -42,6 +42,8 @@ def enforcer(app_fixture):
         ("X-User", "bob", "DELETE", 401),
         ("X-Idp-Groups", "admin", "GET", 401),
         ("X-Idp-Groups", "users", "GET", 200),
+        ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200),
+        ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401),
     ],
 )
 def test_enforcer(app_fixture, enforcer, header, user, method, status):

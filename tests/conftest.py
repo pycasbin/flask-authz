@@ -11,6 +11,6 @@ def app_fixture():
         os.path.split(os.path.realpath(__file__))[0] + "/casbin_files/rbac_model.conf"
     )
     # Set headers where owner for enforcement policy should be located
-    app.config["CASBIN_OWNER_HEADERS"] = {"X-User", "X-Idp-Groups"}
+    app.config["CASBIN_OWNER_HEADERS"] = {"Authorization", "X-User", "X-Idp-Groups"}
 
     yield app
