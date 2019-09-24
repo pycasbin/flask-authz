@@ -3,6 +3,8 @@
 import casbin
 from flask import request, jsonify
 from functools import wraps
+from abc import ABC
+from abc import abstractmethod
 
 from flask_casbin.utils import authorization_decoder, UnSupportedAuthType
 
@@ -88,11 +90,12 @@ class CasbinEnforcer:
         return wrapper
 
 
-class Watcher:
+class Watcher(ABC):
     """
     Watcher interface as it should be implemented for flask-casbin
     """
 
+    @abstractmethod
     def update(self):
         """
         Watcher interface as it should be implemented for flask-casbin
@@ -101,6 +104,7 @@ class Watcher:
         """
         pass
 
+    @abstractmethod
     def set_update_callback(self):
         """
         Set the update callback to be used when an update is detected
@@ -109,6 +113,7 @@ class Watcher:
         """
         pass
 
+    @abstractmethod
     def try_reload(self):
         """
         Method which checks if there is an update necessary for the casbin
