@@ -1,4 +1,4 @@
-defualt_stages: [commit, push]
+default_stages: [commit, push]
 fail_fast: true
 repos:
 - repo: https://github.com/ambv/black

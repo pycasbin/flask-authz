@@ -26,6 +26,16 @@ class CasbinEnforcer:
         if watcher:
             self.e.set_watcher(watcher)
 
+    def set_watcher(self, watcher):
+        """
+        Set the watcher to use with the underlying casbin enforcer
+        Args:
+            watcher (object):
+        Returns:
+            None
+        """
+        self.e.set_watcher(watcher)
+
     def enforcer(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -77,25 +87,25 @@ class CasbinEnforcer:
 
         return wrapper
 
+
 class Watcher:
     """
     Watcher interface as it should be implemented for flask-casbin
     """
 
-    def __init__(self):
-        pass
-
     def update(self):
         """
-        Called when the casbin enforcer is updated
-        :return:
+        Watcher interface as it should be implemented for flask-casbin
+        Returns:
+            None
         """
         pass
 
     def set_update_callback(self):
         """
         Set the update callback to be used when an update is detected
-        :return:
+        Returns:
+            None
         """
         pass
 
@@ -103,6 +113,7 @@ class Watcher:
         """
         Method which checks if there is an update necessary for the casbin
         roles. This is called with each flask request.
-        :return:
+        Returns:
+            None
         """
         pass
