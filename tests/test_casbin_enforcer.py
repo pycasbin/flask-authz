@@ -31,6 +31,18 @@ def enforcer(app_fixture):
     yield CasbinEnforcer(app_fixture, adapter)
 
 
+@pytest.fixture
+def watcher():
+    class SomeWatcher:
+        def should_reload(self):
+            return True
+
+        def update_callback(self):
+            pass
+
+    yield SomeWatcher
+
+
 @pytest.mark.parametrize(
     "header, user, method, status",
     [
@@ -72,6 +84,51 @@ def test_enforcer(app_fixture, enforcer, header, user, method, status):
     assert rv.status_code == status
 
 
+@pytest.mark.parametrize(
+    "header, user, method, status",
+    [
+        ("X-User", "alice", "GET", 200),
+        ("X-User", "alice", "POST", 201),
+        ("X-User", "alice", "DELETE", 202),
+        ("X-User", "bob", "GET", 200),
+        ("X-User", "bob", "POST", 401),
+        ("X-User", "bob", "DELETE", 401),
+        ("X-Idp-Groups", "admin", "GET", 401),
+        ("X-Idp-Groups", "users", "GET", 200),
+        ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200),
+        ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401),
+    ],
+)
+def test_enforcer_with_watcher(
+    app_fixture, enforcer, header, user, method, status, watcher
+):
+    enforcer.set_watcher(watcher())
+
+    @app_fixture.route("/")
+    @enforcer.enforcer
+    def index():
+        return jsonify({"message": "passed"}), 200
+
+    @app_fixture.route("/item", methods=["GET", "POST", "DELETE"])
+    @enforcer.enforcer
+    def item():
+        if request.method == "GET":
+            return jsonify({"message": "passed"}), 200
+        elif request.method == "POST":
+            return jsonify({"message": "passed"}), 201
+        elif request.method == "DELETE":
+            return jsonify({"message": "passed"}), 202
+
+    headers = {header: user}
+    c = app_fixture.test_client()
+    # c.post('/add', data=dict(title='2nd Item', text='The text'))
+    rv = c.get("/")
+    assert rv.status_code == 401
+    caller = getattr(c, method.lower())
+    rv = caller("/item", headers=headers)
+    assert rv.status_code == status
+
+
 def test_manager(app_fixture, enforcer):
     @app_fixture.route("/manager", methods=["POST"])
     @enforcer.manager
@@ -81,3 +138,9 @@ def test_manager(app_fixture, enforcer):
 
     c = app_fixture.test_client()
     c.post("/manager")
+
+
+def test_enforcer_set_watcher(enforcer, watcher):
+    assert enforcer.e.watcher is None
+    enforcer.set_watcher(watcher())
+    assert isinstance(enforcer.e.watcher, watcher)

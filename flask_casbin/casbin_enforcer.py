@@ -41,8 +41,8 @@ class CasbinEnforcer:
     def enforcer(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if self.e.watcher:
-                self.e.watcher.try_reload()
+            if self.e.watcher and self.e.watcher.should_reload():
+                self.e.watcher.update_callback()
             # Check sub, obj act against Casbin polices
             self.app.logger.debug(
                 "Enforce Headers Config: %s\nRequest Headers: %s"
@@ -114,11 +114,11 @@ class Watcher(ABC):
         pass
 
     @abstractmethod
-    def try_reload(self):
+    def should_reload(self):
         """
         Method which checks if there is an update necessary for the casbin
         roles. This is called with each flask request.
         Returns:
-            None
+            Bool
         """
         pass
