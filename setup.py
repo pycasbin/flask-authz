@@ -32,7 +32,7 @@ setup(
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
     ],
-    keywords=["pycasbin", "casbin", "flask", "rbac"],
+    keywords=["pycasbin", "casbin", "flask", "watcher", "redis"],
     packages=find_packages(exclude=["docs", "tests*"]),
     include_package_data=True,
     author="ScienceLogic",
