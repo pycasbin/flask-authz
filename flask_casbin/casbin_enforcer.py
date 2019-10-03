@@ -3,6 +3,8 @@
 import casbin
 from flask import request, jsonify
 from functools import wraps
+from abc import ABC
+from abc import abstractmethod
 
 from flask_casbin.utils import authorization_decoder, UnSupportedAuthType
 
@@ -14,7 +16,7 @@ class CasbinEnforcer:
 
     e = None
 
-    def __init__(self, app, adapter):
+    def __init__(self, app, adapter, watcher=None):
         """
         Args:
             app (object): Flask App object to get Casbin Model
@@ -23,10 +25,24 @@ class CasbinEnforcer:
         self.app = app
         self.adapter = adapter
         self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter, True)
+        if watcher:
+            self.e.set_watcher(watcher)
+
+    def set_watcher(self, watcher):
+        """
+        Set the watcher to use with the underlying casbin enforcer
+        Args:
+            watcher (object):
+        Returns:
+            None
+        """
+        self.e.set_watcher(watcher)
 
     def enforcer(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
+            if self.e.watcher and self.e.watcher.should_reload():
+                self.e.watcher.update_callback()
             # Check sub, obj act against Casbin polices
             self.app.logger.debug(
                 "Enforce Headers Config: %s\nRequest Headers: %s"
@@ -72,3 +88,37 @@ class CasbinEnforcer:
             return func(self.e, *args, **kwargs)
 
         return wrapper
+
+
+class Watcher(ABC):
+    """
+    Watcher interface as it should be implemented for flask-casbin
+    """
+
+    @abstractmethod
+    def update(self):
+        """
+        Watcher interface as it should be implemented for flask-casbin
+        Returns:
+            None
+        """
+        pass
+
+    @abstractmethod
+    def set_update_callback(self):
+        """
+        Set the update callback to be used when an update is detected
+        Returns:
+            None
+        """
+        pass
+
+    @abstractmethod
+    def should_reload(self):
+        """
+        Method which checks if there is an update necessary for the casbin
+        roles. This is called with each flask request.
+        Returns:
+            Bool
+        """
+        pass
