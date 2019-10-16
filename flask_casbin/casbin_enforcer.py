@@ -66,7 +66,9 @@ class CasbinEnforcer:
                         if self.e.enforce(owner, str(request.url_rule), request.method):
                             return func(*args, **kwargs)
                     else:
-                        for owner in request.headers.getlist(header):
+                        # Split header by ',' in case of groups when groups are
+                        # sent "group1,group2,group3,..." in the header
+                        for owner in request.headers.get(header).split(","):
                             self.app.logger.debug(
                                 "Enforce against owner: %s header: %s"
                                 % (owner.strip('"'), header)
