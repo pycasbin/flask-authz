@@ -1,3 +1,3 @@
 casbin==0.2
 Flask==1.0.2
-Werkzeug==0.14.1
+Werkzeug==0.15.3
