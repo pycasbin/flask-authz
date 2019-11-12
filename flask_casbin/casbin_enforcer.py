@@ -68,7 +68,9 @@ class CasbinEnforcer:
                     else:
                         # Split header by ',' in case of groups when groups are
                         # sent "group1,group2,group3,..." in the header
-                        for owner in request.headers.get(header).split(","):
+                        for owner in self.sanitize_group_headers(
+                            request.headers.get(header)
+                        ):
                             self.app.logger.debug(
                                 "Enforce against owner: %s header: %s"
                                 % (owner.strip('"'), header)
@@ -81,6 +83,28 @@ class CasbinEnforcer:
                 return (jsonify({"message": "Unauthorized"}), 401)
 
         return wrapper
+
+    @staticmethod
+    def sanitize_group_headers(headers_str):
+        """
+        Sanitizes group header string so that it is easily parsable by enforcer
+        removes extra spaces, and converts comma delimited or white space
+        delimited list into a list.
+        Returns:
+            str
+        """
+        # If there are commas and white space in the string,
+        # remove the whitespace
+        if " " in headers_str and "," in headers_str:
+            headers_str = headers_str.replace(" ", "")
+        # If there are no commas in the string, return a list
+        # delimited by whitespace
+        if " " in headers_str and "," not in headers_str:
+            return headers_str.split(" ")
+        # There are commas and no whitespace in the string, return a list
+        # delimited by commas
+        else:
+            return headers_str.split(",")
 
     def manager(self, func):
         """Get the Casbin Enforcer Object to manager Casbin"""
