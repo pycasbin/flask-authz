@@ -18,7 +18,7 @@ pip install flask-authz
 
 ## Simple Example
 
-This repo is just a working Flask app that shows the usage of flask-authz. To use it in your existing Flask app, you need:
+This repo is just a working Flask app that shows the usage of flask-authz (see: https://github.com/pycasbin/flask-authz/blob/master/app.py). To use it in your existing Flask app, you need:
 
 ```python
 from authz.middleware import CasbinMiddleware
@@ -46,9 +46,17 @@ if __name__ == '__main__':
 - The default policy ``authz_policy.csv`` is:
 
 ```csv
+p, alice, /dataset1/*, GET
+p, alice, /dataset1/resource1, POST
+p, bob, /dataset2/resource1, *
+p, bob, /dataset2/resource2, GET
+p, bob, /dataset2/folder1/*, POST
+p, dataset1_admin, /dataset1/*, *
+p, *, /login, *
+
 p, anonymous, /, GET
-p, admin, *, *
-g, alice, admin
+
+g, cathy, dataset1_admin
 ```
 
 It means ``anonymous`` user can only access homepage ``/``. Admin users like alice can access any pages. Currently all accesses are regarded as ``anonymous``. Add your authentication to let a user log in.
