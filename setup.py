@@ -37,6 +37,5 @@ setup(
     include_package_data=True,
     author="ScienceLogic",
     install_requires=install_requires,
-    dependency_links=dependency_links,
-    author_email="airlocks@sciencelogic.com",
+    dependency_links=dependency_links
 )
