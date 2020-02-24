@@ -8,7 +8,7 @@ Installation / Usage
 
 To install use pip:
 ```
-$ pip install flask-casbin
+TBD
 ```
 
 Or clone the repo:
@@ -40,6 +40,25 @@ def make_casbin_change(manager):
     # Manager is an casbin.enforcer.Enforcer object to make changes to Casbin
     return jsonify({'message': 'If you see this you have access'})
 ```
+Example casbinmodel.conf
+```ini
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+```
+This example file can be found in `tests/casbin_files` along with an example
+RBAC policy file.
 
 Development
 ------------
