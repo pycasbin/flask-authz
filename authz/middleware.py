@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import sqlite3
 from werkzeug.wrappers import Request
 from werkzeug.exceptions import Forbidden
-
+from casbin_sqlalchemy_adapter import CasbinRule
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from casbin_sqlalchemy_adapter import Base
 
 class CasbinMiddleware:
     def __init__(self, app, enforcer):
@@ -34,10 +37,18 @@ class CasbinMiddleware:
         return self.app(environ, start_response)
 
     def check_permission(self, request):
+        conn = sqlite3.connect('test.db')
+        cur = conn.cursor()
+        # currently it is dummy user but change to the logged in user 
+        cur.execute("SELECT * FROM casbin_rule where v0='prince'") 
+ 
+        rows = cur.fetchall()
+        print(rows[0][3],rows[0][4])
         # Customize it based on your authentication method.
         user = request.remote_user
         if user is None:
-            user = 'anonymous'
+            user = 'prince'
         path = request.path
         method = request.method
-        return self.enforcer.enforce(user, path, method)
+	
+        return path==rows[0][3] and method==rows[0][4]
