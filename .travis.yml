@@ -1,5 +1,6 @@
 language: python
 python:
+- '3.6'
 - '3.7'
 - '3.8'
 install:
@@ -7,6 +8,6 @@ install:
 - pip install -r dev_requirements.txt
 - pip install coveralls
 script:
-- coverage run -m pytest
+- pytest --cov
 after_success:
 - coveralls
