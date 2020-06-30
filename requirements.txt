@@ -1,3 +1,2 @@
-casbin==0.8.3
-Flask==1.1.1
-Werkzeug==0.16.0
+casbin
+flask

@@ -1,25 +1,41 @@
-import setuptools
+from setuptools import setup, find_packages
+from codecs import open
+from os import path
 
+__version__ = "2.0.0"
 desc_file = "README.md"
 
-with open(desc_file, "r") as fh:
-    long_description = fh.read()
+here = path.abspath(path.dirname(__file__))
 
-setuptools.setup(
+# Get the long description from the README file
+with open(path.join(here, desc_file), encoding="utf-8") as f:
+    long_description = f.read()
+
+# get the dependencies and installs
+with open(path.join(here, "requirements.txt"), encoding="utf-8") as f:
+    all_reqs = f.read().split("\n")
+
+install_requires = [x.strip() for x in all_reqs if "git+" not in x]
+dependency_links = [
+    x.strip().replace("git+", "") for x in all_reqs if x.startswith("git+")
+]
+
+setup(
     name="flask-authz",
-    version="1.0.0",
-    author="Yang Luo",
-    author_email="hsluoyz@gmail.com",
+    version=__version__,
     description="An authorization middleware for Flask that supports ACL, RBAC, ABAC, based on Casbin",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    author=["Yang Luo", "Sciencelogic"],
+    author_email="hsluoyz@gmail.com",
     url="https://github.com/pycasbin/flask-authz",
-    keywords=["flask", "casbin", "auth", "authz", "acl", "rbac", "abac", "access control", "authorization", "permission"],
-    packages=setuptools.find_packages(),
-    install_requires=['casbin', 'flask', 'werkzeug'],
-    python_requires=">=3.5",
+    download_url="https://github.com/pycasbin/flask-authz/tarball/" + __version__,
     license="Apache 2.0",
+    python_requires=">=3.5",
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
@@ -27,5 +43,22 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
+    keywords=[
+        "flask",
+        "pycasbin",
+        "casbin",
+        "auth",
+        "authz",
+        "acl",
+        "rbac",
+        "abac",
+        "access control",
+        "authorization",
+        "permission"
+    ],
+    packages=find_packages(exclude=["docs", "tests*"]),
     data_files=[desc_file],
+    include_package_data=True,
+    install_requires=install_requires,
+    dependency_links=dependency_links
 )

@@ -103,5 +103,30 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# pycharm
 .idea/
 *.iml
+
+# Packages
+*.egg-info
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+lib
+lib64
+
+.tox
+
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+docs/_build
+
+# Cookiecutter
+output/
