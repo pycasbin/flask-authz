@@ -15,36 +15,59 @@ flask-authz is an authorization middleware for [Flask](http://flask.pocoo.org/),
 ```
 pip install flask-authz
 ```
-
-## Simple Example
-
-This repo is just a working Flask app that shows the usage of flask-authz (see: https://github.com/pycasbin/flask-authz/blob/master/app.py). To use it in your existing Flask app, you need:
-
-```python
-from authz.middleware import CasbinMiddleware
-import casbin
-from flask import Flask
-
-app = Flask(__name__)
-
-# Initialize the Casbin enforcer, load the casbin model and policy from files.
-# Change the 2nd arg to use a database.
-enforcer = casbin.Enforcer("authz_model.conf", "authz_policy.csv")
-
-app.wsgi_app = CasbinMiddleware(app.wsgi_app, enforcer)
-
-
-@app.route("/")
-def hello_world():
-    return "Hello World!"
-
-
-if __name__ == '__main__':
-    app.run()
+Or clone the repo:
+```
+$ git clone https://github.com/pycasbin/flask-authz.git
+$ python setup.py install
 ```
 
-- The default policy ``authz_policy.csv`` is:
+Module Usage:
+```python
+from flask import Flask
+from flask_authz import CasbinEnforcer
+from casbin.persist.adapters import FileAdapter
 
+app = Flask(__name__)
+# Set up Casbin model config
+app.config['CASBIN_MODEL'] = 'casbinmodel.conf'
+# Set headers where owner for enforcement policy should be located
+app.config['CASBIN_OWNER_HEADERS'] = {'X-User', 'X-Group'}
+# Set up Casbin Adapter
+adapter = FileAdapter('rbac_policy.csv')
+casbin_enforcer = CasbinEnforcer(app, adapter)
+
+@app.route('/', methods=['GET'])
+@casbin_enforcer.enforcer
+def get_root():
+    return jsonify({'message': 'If you see this you have access'})
+
+@app.route('/manager', methods=['POST'])
+@casbin_enforcer.enforcer
+@casbin_enforcer.manager
+def make_casbin_change(manager):
+    # Manager is an casbin.enforcer.Enforcer object to make changes to Casbin
+    return jsonify({'message': 'If you see this you have access'})
+```
+Example Config  
+This example file can be found in `tests/casbin_files`
+```ini
+[request_definition]
+r = sub, obj, act
+
+[policy_definition]
+p = sub, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+```
+Example Policy  
+This example file can be found in `tests/casbin_files`
 ```csv
 p, alice, /dataset1/*, GET
 p, alice, /dataset1/resource1, POST
@@ -59,24 +82,31 @@ p, anonymous, /, GET
 g, cathy, dataset1_admin
 ```
 
-It means ``anonymous`` user can only access homepage ``/``. Admin users like alice can access any pages. Currently all accesses are regarded as ``anonymous``. Add your authentication to let a user log in.
-
-## How are subject, object, action defined?
-
-In ``middleware.py``:
-
+Development
+------------
+1. Fork
+2. Install Dev ENV
 ```python
-def check_permission(self, request):
-    # change the user, path, method as you need.
-    user = request.remote_user # subject
-    if user is None:
-        user = 'anonymous'
-    path = request.path # object
-    method = request.method # action
-    return self.enforcer.enforce(user, path, method)
+# Install Flask-Casbin with Dev packages
+pip install -r dev_requirements.txt
+pip install -r requirements.txt
+pip install -e .
+# Install Pre-commits
+pre-commit install
+# Create feature branch
+git checkout -b feature-more-cool-stuff
+# Code stuff
 ```
+Then push your changes and create a PR
 
-You may need to copy the ``middleware.py`` code to your project and modify it directly if you have other definitions for subject, object, action.
+#### Manually Bump Version
+```
+bumpversion major  # major release
+or
+bumpversion minor  # minor release
+or
+bumpversion patch  # hotfix release
+```
 
 ## Documentation
 
@@ -95,3 +125,4 @@ For how to write authorization policy and other details, please refer to [the Ca
 ## License
 
 This project is under Apache 2.0 License. See the [LICENSE](LICENSE) file for the full license text.
+

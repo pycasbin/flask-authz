@@ -1,0 +1,10 @@
+pre-commit
+black
+sphinx
+sphinx_rtd_theme
+pytest
+pytest-cov
+casbin_sqlalchemy_adapter
+coverage
+pypi-publisher
+bumpversion
