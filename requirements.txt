@@ -1,2 +1,8 @@
-casbin
-flask
+casbin==0.8.4
+click==7.1.2
+flask>=0.12.2,~=1.1.2
+itsdangerous==1.1.0
+jinja2==2.11.2
+markupsafe==1.1.1
+simpleeval==0.9.10
+werkzeug==1.0.1
