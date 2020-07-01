@@ -8,6 +8,6 @@ install:
 - pip install -r dev_requirements.txt --upgrade
 - pip install coveralls
 script:
-- pytest --cov
+- pytest --cov flask_authz
 after_success:
 - coveralls
