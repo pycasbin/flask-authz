@@ -98,6 +98,13 @@ git checkout -b feature-more-cool-stuff
 # Code stuff
 ```
 Then push your changes and create a PR
+#### update requirements with pip-tools
+```bash
+# update requirements.txt
+pip-compile --no-annotate --no-header --rebuild requirements.in
+# sync venv
+pip-sync
+```
 
 #### Manually Bump Version
 ```

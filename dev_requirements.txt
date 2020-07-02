@@ -1,3 +1,4 @@
+pip-tools
 pre-commit
 black
 sphinx
