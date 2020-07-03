@@ -48,7 +48,7 @@ def make_casbin_change(manager):
     # Manager is an casbin.enforcer.Enforcer object to make changes to Casbin
     return jsonify({'message': 'If you see this you have access'})
 ```
-Example Config  
+Example Config
 This example file can be found in `tests/casbin_files`
 ```ini
 [request_definition]
@@ -66,7 +66,7 @@ e = some(where (p.eft == allow))
 [matchers]
 m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 ```
-Example Policy  
+Example Policy
 This example file can be found in `tests/casbin_files`
 ```csv
 p, alice, /dataset1/*, GET
@@ -84,20 +84,22 @@ g, cathy, dataset1_admin
 
 Development
 ------------
-1. Fork
-2. Install Dev ENV
+
+#### Run unit tests
+1. Fork/Clone repository
+2. Install flask-authz dependencies, and run `pytest`
 ```python
-# Install Flask-Casbin with Dev packages
 pip install -r dev_requirements.txt
 pip install -r requirements.txt
-pip install -e .
-# Install Pre-commits
-pre-commit install
-# Create feature branch
-git checkout -b feature-more-cool-stuff
-# Code stuff
+pytest
 ```
-Then push your changes and create a PR
+
+#### Setup pre-commit checks
+```python
+pre-commit install
+```
+
+
 #### update requirements with pip-tools
 ```bash
 # update requirements.txt
