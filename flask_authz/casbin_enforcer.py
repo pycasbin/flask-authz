@@ -48,6 +48,8 @@ class CasbinEnforcer:
                 "Enforce Headers Config: %s\nRequest Headers: %s"
                 % (self.app.config.get("CASBIN_OWNER_HEADERS"), request.headers)
             )
+            # Set resource URI from request
+            uri = str(request.path)
             for header in self.app.config.get("CASBIN_OWNER_HEADERS"):
                 if header in request.headers:
                     # Make Authorization Header Parser standard
@@ -63,7 +65,7 @@ class CasbinEnforcer:
                                 "decoding is unsupported by flask-casbin at this time"
                             )
                             continue
-                        if self.e.enforce(owner, str(request.url_rule), request.method):
+                        if self.e.enforce(owner, uri, request.method):
                             return func(*args, **kwargs)
                     else:
                         # Split header by ',' in case of groups when groups are
@@ -76,7 +78,7 @@ class CasbinEnforcer:
                                 % (owner.strip('"'), header)
                             )
                             if self.e.enforce(
-                                owner.strip('"'), str(request.url_rule), request.method
+                                owner.strip('"'), uri, request.method
                             ):
                                 return func(*args, **kwargs)
             else:
