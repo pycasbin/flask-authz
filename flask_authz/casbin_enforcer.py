@@ -27,6 +27,7 @@ class CasbinEnforcer:
         self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter, True)
         if watcher:
             self.e.set_watcher(watcher)
+        self._owner_loader = None
 
     def set_watcher(self, watcher):
         """
@@ -37,6 +38,17 @@ class CasbinEnforcer:
             None
         """
         self.e.set_watcher(watcher)
+
+    def owner_loader(self, callback):
+        """
+        This sets the callback for get owner. The
+        function return a owner object, or ``None``
+
+        :param callback: The callback for retrieving a owner object.
+        :type callback: callable
+        """
+        self._owner_loader = callback
+        return callback
 
     def enforcer(self, func):
         @wraps(func)
@@ -50,6 +62,14 @@ class CasbinEnforcer:
             )
             # Set resource URI from request
             uri = str(request.path)
+            # Get owner from owner_loader
+            if self._owner_loader:
+                self.app.logger.info("Get owner from owner_loader")
+                for owner in self._owner_loader():
+                    if self.e.enforce(
+                            owner.strip('"'), uri, request.method
+                    ):
+                        return func(*args, **kwargs)
             for header in self.app.config.get("CASBIN_OWNER_HEADERS"):
                 if header in request.headers:
                     # Make Authorization Header Parser standard
