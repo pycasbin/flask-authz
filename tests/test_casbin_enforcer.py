@@ -147,3 +147,47 @@ def test_enforcer_set_watcher(enforcer, watcher):
     assert enforcer.e.watcher is None
     enforcer.set_watcher(watcher())
     assert isinstance(enforcer.e.watcher, watcher)
+
+
+@pytest.mark.parametrize(
+    "owner, method, status",
+    [
+        (["alice"], "GET", 200),
+        (["alice"], "POST", 201),
+        (["alice"], "DELETE", 202),
+        (["bob"], "GET", 200),
+        (["bob"], "POST", 401),
+        (["bob"], "DELETE", 401),
+        (["admin"], "GET", 401),
+        (["users"], "GET", 200),
+        (["alice", "bob"], "POST", 201),
+        (["noexist", "testnoexist"], "POST", 401),
+    ],
+)
+def test_enforcer_with_owner_loader(app_fixture, enforcer, owner, method, status):
+    @app_fixture.route("/")
+    @enforcer.enforcer
+    def index():
+        return jsonify({"message": "passed"}), 200
+
+    @app_fixture.route("/item", methods=["GET", "POST", "DELETE"])
+    @enforcer.enforcer
+    def item():
+        if request.method == "GET":
+            return jsonify({"message": "passed"}), 200
+        elif request.method == "POST":
+            return jsonify({"message": "passed"}), 201
+        elif request.method == "DELETE":
+            return jsonify({"message": "passed"}), 202
+
+    @enforcer.owner_loader
+    def owner_loader():
+        return owner
+
+    c = app_fixture.test_client()
+    # c.post('/add', data=dict(title='2nd Item', text='The text'))
+    rv = c.get("/")
+    assert rv.status_code == 401
+    caller = getattr(c, method.lower())
+    rv = caller("/item")
+    assert rv.status_code == status
