@@ -47,6 +47,9 @@ def watcher():
     "header, user, method, status, user_name",
     [
         ("X-User", "alice", "GET", 200, "X-User"),
+        ("X-USER", "alice", "GET", 200, "x-user"),
+        ("x-user", "alice", "GET", 200, "X-USER"),
+        ("X-User", "alice", "GET", 200, "X-USER"),
         ("X-User", "alice", "GET", 200, "X-Not-A-Header"),
         ("X-User", "alice", "POST", 201, None),
         ("X-User", "alice", "DELETE", 202, None),
