@@ -32,6 +32,9 @@ app = Flask(__name__)
 app.config['CASBIN_MODEL'] = 'casbinmodel.conf'
 # Set headers where owner for enforcement policy should be located
 app.config['CASBIN_OWNER_HEADERS'] = {'X-User', 'X-Group'}
+# Add User Audit Logging with user name associated to log
+# i.e. `[2020-11-10 12:55:06,060] ERROR in casbin_enforcer: Unauthorized attempt: method: GET resource: /api/v1/item by user: janedoe@example.com`
+app.config['CASBIN_USER_NAME_HEADERS'] = {'X-User'}
 # Set up Casbin Adapter
 adapter = FileAdapter('rbac_policy.csv')
 casbin_enforcer = CasbinEnforcer(app, adapter)
