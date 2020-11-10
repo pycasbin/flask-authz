@@ -74,10 +74,10 @@ class CasbinEnforcer:
                             owner.strip('"'), uri, request.method
                     ):
                         return func(*args, **kwargs)
-            for header in self.app.config.get("CASBIN_OWNER_HEADERS"):
+            for header in map(str.lower, self.app.config.get("CASBIN_OWNER_HEADERS")):
                 if header in request.headers:
                     # Make Authorization Header Parser standard
-                    if header == "Authorization":
+                    if header == "authorization":
                         # Get Auth Value then decode and parse for owner
                         try:
                             owner = authorization_decoder(request.headers.get(header))
@@ -104,7 +104,7 @@ class CasbinEnforcer:
                                 "Enforce against owner: %s header: %s"
                                 % (owner.strip('"'), header)
                             )
-                            if self.user_name_headers and header in self.user_name_headers:
+                            if self.user_name_headers and header in map(str.lower, self.user_name_headers):
                                 owner_audit = owner
                             if self.e.enforce(
                                 owner.strip('"'), uri, request.method
