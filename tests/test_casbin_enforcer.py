@@ -44,24 +44,32 @@ def watcher():
 
 
 @pytest.mark.parametrize(
-    "header, user, method, status",
+    "header, user, method, status, user_name",
     [
-        ("X-User", "alice", "GET", 200),
-        ("X-User", "alice", "POST", 201),
-        ("X-User", "alice", "DELETE", 202),
-        ("X-User", "bob", "GET", 200),
-        ("X-User", "bob", "POST", 401),
-        ("X-User", "bob", "DELETE", 401),
-        ("X-Idp-Groups", "admin", "GET", 401),
-        ("X-Idp-Groups", "users", "GET", 200),
-        ("X-Idp-Groups", "noexist,testnoexist,users", "GET", 200),
-        ("X-Idp-Groups", "noexist testnoexist users", "GET", 200),
-        ("X-Idp-Groups", "noexist, testnoexist, users", "GET", 200),
-        ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200),
-        ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401),
+        ("X-User", "alice", "GET", 200, "X-User"),
+        ("X-USER", "alice", "GET", 200, "x-user"),
+        ("x-user", "alice", "GET", 200, "X-USER"),
+        ("X-User", "alice", "GET", 200, "X-USER"),
+        ("X-User", "alice", "GET", 200, "X-Not-A-Header"),
+        ("X-User", "alice", "POST", 201, None),
+        ("X-User", "alice", "DELETE", 202, None),
+        ("X-User", "bob", "GET", 200, None),
+        ("X-User", "bob", "POST", 401, None),
+        ("X-User", "bob", "DELETE", 401, None),
+        ("X-Idp-Groups", "admin", "GET", 401, "X-User"),
+        ("X-Idp-Groups", "users", "GET", 200, None),
+        ("X-Idp-Groups", "noexist,testnoexist,users", "GET", 200, None),
+        ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
+        ("X-Idp-Groups", "noexist, testnoexist, users", "GET", 200, None),
+        ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
+        ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),
     ],
 )
-def test_enforcer(app_fixture, enforcer, header, user, method, status):
+def test_enforcer(app_fixture, enforcer, header, user, method, status, user_name):
+    # enable auditing with user name
+    if user_name:
+        enforcer.user_name_headers = {user_name}
+
     @app_fixture.route("/")
     @enforcer.enforcer
     def index():

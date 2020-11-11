@@ -28,6 +28,7 @@ class CasbinEnforcer:
         if watcher:
             self.e.set_watcher(watcher)
         self._owner_loader = None
+        self.user_name_headers = app.config.get("CASBIN_USER_NAME_HEADERS", None)
 
     def set_watcher(self, watcher):
         """
@@ -55,6 +56,9 @@ class CasbinEnforcer:
         def wrapper(*args, **kwargs):
             if self.e.watcher and self.e.watcher.should_reload():
                 self.e.watcher.update_callback()
+            # String used to hold the owners user name for audit logging
+            owner_audit = ""
+
             # Check sub, obj act against Casbin polices
             self.app.logger.debug(
                 "Enforce Headers Config: %s\nRequest Headers: %s"
@@ -70,10 +74,10 @@ class CasbinEnforcer:
                             owner.strip('"'), uri, request.method
                     ):
                         return func(*args, **kwargs)
-            for header in self.app.config.get("CASBIN_OWNER_HEADERS"):
+            for header in map(str.lower, self.app.config.get("CASBIN_OWNER_HEADERS")):
                 if header in request.headers:
                     # Make Authorization Header Parser standard
-                    if header == "Authorization":
+                    if header == "authorization":
                         # Get Auth Value then decode and parse for owner
                         try:
                             owner = authorization_decoder(request.headers.get(header))
@@ -85,6 +89,9 @@ class CasbinEnforcer:
                                 "decoding is unsupported by flask-casbin at this time"
                             )
                             continue
+
+                        if self.user_name_headers and header in self.user_name_headers:
+                            owner_audit = owner
                         if self.e.enforce(owner, uri, request.method):
                             return func(*args, **kwargs)
                     else:
@@ -97,11 +104,20 @@ class CasbinEnforcer:
                                 "Enforce against owner: %s header: %s"
                                 % (owner.strip('"'), header)
                             )
+                            if self.user_name_headers and header in map(str.lower, self.user_name_headers):
+                                owner_audit = owner
                             if self.e.enforce(
                                 owner.strip('"'), uri, request.method
                             ):
                                 return func(*args, **kwargs)
             else:
+                self.app.logger.error(
+                    "Unauthorized attempt: method: %s resource: %s%s" % (
+                        request.method,
+                        uri,
+                        "" if not self.user_name_headers and owner_audit != "" else " by user: %s" % owner_audit
+                    )
+                )
                 return (jsonify({"message": "Unauthorized"}), 401)
 
         return wrapper
