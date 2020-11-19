@@ -90,7 +90,7 @@ class CasbinEnforcer:
                             )
                             continue
 
-                        if self.user_name_headers and header in self.user_name_headers:
+                        if self.user_name_headers and header in map(str.lower, self.user_name_headers):
                             owner_audit = owner
                         if self.e.enforce(owner, uri, request.method):
                             self.app.logger.info(
