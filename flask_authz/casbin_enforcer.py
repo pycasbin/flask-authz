@@ -24,7 +24,7 @@ class CasbinEnforcer:
         """
         self.app = app
         self.adapter = adapter
-        self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter, True)
+        self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter)
         if watcher:
             self.e.set_watcher(watcher)
         self._owner_loader = None
@@ -90,9 +90,16 @@ class CasbinEnforcer:
                             )
                             continue
 
-                        if self.user_name_headers and header in self.user_name_headers:
+                        if self.user_name_headers and header in map(str.lower, self.user_name_headers):
                             owner_audit = owner
                         if self.e.enforce(owner, uri, request.method):
+                            self.app.logger.info(
+                                "access granted: method: %s resource: %s%s" % (
+                                    request.method,
+                                    uri,
+                                    "" if not self.user_name_headers and owner_audit != "" else " to user: %s" % owner_audit
+                                )
+                            )
                             return func(*args, **kwargs)
                     else:
                         # Split header by ',' in case of groups when groups are
@@ -109,6 +116,13 @@ class CasbinEnforcer:
                             if self.e.enforce(
                                 owner.strip('"'), uri, request.method
                             ):
+                                self.app.logger.info(
+                                    "access granted: method: %s resource: %s%s" % (
+                                        request.method,
+                                        uri,
+                                        "" if not self.user_name_headers and owner_audit != "" else " to user: %s" % owner_audit
+                                    )
+                                )
                                 return func(*args, **kwargs)
             else:
                 self.app.logger.error(
