@@ -87,7 +87,7 @@ class CasbinEnforcer:
                     if header == "authorization":
                         # Get Auth Value then decode and parse for owner
                         try:
-                            owner = authorization_decoder(request.headers.get(header))
+                            owner = authorization_decoder(self.app.config, request.headers.get(header))
                         except UnSupportedAuthType:
                             # Continue if catch unsupported type in the event of
                             # Other headers needing to be checked
@@ -95,6 +95,9 @@ class CasbinEnforcer:
                                 "Authorization header type requested for "
                                 "decoding is unsupported by flask-casbin at this time"
                             )
+                            continue
+                        except Exception as e:
+                            self.app.logger.info(e)
                             continue
 
                         if self.user_name_headers and header in map(str.lower, self.user_name_headers):

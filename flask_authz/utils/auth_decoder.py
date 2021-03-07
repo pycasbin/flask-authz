@@ -1,5 +1,7 @@
 from base64 import b64decode
 
+import jwt
+
 
 class UnSupportedAuthType(Exception):
     status_code = 501
@@ -20,11 +22,12 @@ class UnSupportedAuthType(Exception):
         return rv
 
 
-def authorization_decoder(auth_str: str):
+def authorization_decoder(config, auth_str: str):
     """
     Authorization token decoder based on type. This will decode the token and
     only return the owner
     Args:
+        config: app.config
         auth_str: Authorization string should be in "<type> <token>" format
     Returns:
         decoded owner from token
@@ -35,6 +38,8 @@ def authorization_decoder(auth_str: str):
         """Basic format <user>:<password> return only the user"""
         return b64decode(token).decode().split(":")[0]
     elif type == "Bearer":
-        raise UnSupportedAuthType("Bearer is not implemented yet")
+        decoded_jwt = jwt.decode(token, config.get("JWT_SECRET_KEY"),
+                                 algorithms=config.get('JWT_HASH'))
+        return decoded_jwt.get("identity", '')
     else:
         raise UnSupportedAuthType("%s Authorization is not supported" % type)
