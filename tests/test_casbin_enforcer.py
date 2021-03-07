@@ -64,9 +64,9 @@ def watcher():
         ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
         ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGl0eSI6ImJvYiJ9."
                           "LM-CqxAM2MtT2uT3AO69rZ3WJ81nnyMQicizh4oqBwk", "GET", 200, None),
-        ("Authorization",
-         "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTUxMDg0OTIuNTY5MjksImlkZW50aXR5IjoiQm9iIn0."
-         "CAeMpG-gKbucHU7-KMiqM7H_gTkHSRvXSjNtlvh5DlE", "GET", 401, None),
+        ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
+                          "eyJleHAiOjE2MTUxMDg0OTIuNTY5MjksImlkZW50aXR5IjoiQm9iIn0."
+                          "CAeMpG-gKbucHU7-KMiqM7H_gTkHSRvXSjNtlvh5DlE", "GET", 401, None),
         ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),
         ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),
     ],
@@ -117,7 +117,7 @@ def test_enforcer(app_fixture, enforcer, header, user, method, status, user_name
     ],
 )
 def test_enforcer_with_watcher(
-        app_fixture, enforcer, header, user, method, status, watcher
+    app_fixture, enforcer, header, user, method, status, watcher
 ):
     enforcer.set_watcher(watcher())
 

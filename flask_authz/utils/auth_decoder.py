@@ -40,7 +40,7 @@ def authorization_decoder(config, auth_str: str):
     elif type == "Bearer":
         """return only the identity， depends on JWT 2.x"""
         decoded_jwt = jwt.decode(token, config.get("JWT_SECRET_KEY"),
-                                 algorithms=config.get('JWT_HASH'))
-        return decoded_jwt.get("identity", '')
+                                 algorithms=config.get("JWT_HASH"))
+        return decoded_jwt.get("identity", "")
     else:
         raise UnSupportedAuthType("%s Authorization is not supported" % type)
