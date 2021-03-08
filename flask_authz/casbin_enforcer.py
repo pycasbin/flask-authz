@@ -16,7 +16,7 @@ class CasbinEnforcer:
 
     e = None
 
-    def __init__(self, app, adapter, watcher=None):
+    def __init__(self, app=None, adapter=None, watcher=None):
         """
         Args:
             app (object): Flask App object to get Casbin Model
@@ -24,10 +24,18 @@ class CasbinEnforcer:
         """
         self.app = app
         self.adapter = adapter
-        self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter)
-        if watcher:
-            self.e.set_watcher(watcher)
+        self.e = None
+        self.watcher = watcher
         self._owner_loader = None
+        self.user_name_headers = None
+        if self.app is not None:
+            self.init_app(self.app)
+
+    def init_app(self, app):
+        self.app = app
+        self.e = casbin.Enforcer(app.config.get("CASBIN_MODEL"), self.adapter)
+        if self.watcher:
+            self.e.set_watcher(self.watcher)
         self.user_name_headers = app.config.get("CASBIN_USER_NAME_HEADERS", None)
 
     def set_watcher(self, watcher):
