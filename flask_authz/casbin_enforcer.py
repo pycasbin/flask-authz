@@ -22,14 +22,14 @@ class CasbinEnforcer:
             app (object): Flask App object to get Casbin Model
             adapter (object): Casbin Adapter
         """
-        self.app = None
+        self.app = app
         self.adapter = adapter
         self.e = None
         self.watcher = watcher
         self._owner_loader = None
         self.user_name_headers = None
-        if app:
-            self.init_app(app)
+        if self.app is not None:
+            self.init_app(self.app)
 
     def init_app(self, app):
         self.app = app
