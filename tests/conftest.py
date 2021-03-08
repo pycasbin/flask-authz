@@ -12,5 +12,7 @@ def app_fixture():
     )
     # Set headers where owner for enforcement policy should be located
     app.config["CASBIN_OWNER_HEADERS"] = {"Authorization", "X-User", "X-Idp-Groups"}
+    app.config["JWT_SECRET_KEY"] = "SECRET_KEY"
+    app.config["JWT_HASH"] = "HS256"
 
     yield app
