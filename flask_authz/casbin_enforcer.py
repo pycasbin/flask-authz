@@ -16,7 +16,7 @@ class CasbinEnforcer:
 
     e = None
 
-    def __init__(self, app=None, adapter=None, watcher=None):
+    def __init__(self, app, adapter, watcher=None):
         """
         Args:
             app (object): Flask App object to get Casbin Model
