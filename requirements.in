@@ -1,2 +1,3 @@
 casbin
-flask>=0.12.2,~=1.1.2
+flask~=1.1.2
+PyJWT
