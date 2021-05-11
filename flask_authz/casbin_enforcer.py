@@ -78,8 +78,9 @@ class CasbinEnforcer:
             if self._owner_loader:
                 self.app.logger.info("Get owner from owner_loader")
                 for owner in self._owner_loader():
+                    owner = owner.strip('"') if isinstance(owner, str) else owner
                     if self.e.enforce(
-                            owner.strip('"'), uri, request.method
+                            owner, uri, request.method
                     ):
                         return func(*args, **kwargs)
             for header in map(str.lower, self.app.config.get("CASBIN_OWNER_HEADERS")):
