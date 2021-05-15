@@ -1,7 +1,6 @@
 from setuptools import setup, find_packages
 from os import path
 
-__version__ = "2.2.0"
 desc_file = "README.md"
 
 here = path.abspath(path.dirname(__file__))
@@ -21,7 +20,6 @@ dependency_links = [
 
 setup(
     name="flask-authz",
-    version=__version__,
     description="An authorization middleware for Flask that supports ACL, RBAC, ABAC, based on Casbin",
     long_description=long_description,
     long_description_content_type="text/markdown",
