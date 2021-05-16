@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, __version__
 from os import path
 
 desc_file = "README.md"
