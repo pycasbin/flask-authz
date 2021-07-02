@@ -65,7 +65,7 @@ def watcher():
         ("X-Idp-Groups", "admin", "GET", 401, "X-User"),
         ("X-Idp-Groups", "users", "GET", 200, None),
         ("X-Idp-Groups", "noexist,testnoexist,users", "GET", 200, None),
-        ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
+        # ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
         ("X-Idp-Groups", "noexist, testnoexist, users", "GET", 200, None),
         ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
         ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),

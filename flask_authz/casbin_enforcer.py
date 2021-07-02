@@ -59,7 +59,7 @@ class CasbinEnforcer:
         self._owner_loader = callback
         return callback
 
-    def enforcer(self, func):
+    def enforcer(self, func, delimiter=','):
         @wraps(func)
         def wrapper(*args, **kwargs):
             if self.e.watcher and self.e.watcher.should_reload():
@@ -117,7 +117,8 @@ class CasbinEnforcer:
                         # Split header by ',' in case of groups when groups are
                         # sent "group1,group2,group3,..." in the header
                         for owner in self.sanitize_group_headers(
-                            request.headers.get(header)
+                            request.headers.get(header),
+                            delimiter
                         ):
                             self.app.logger.debug(
                                 "Enforce against owner: %s header: %s"
@@ -149,26 +150,19 @@ class CasbinEnforcer:
         return wrapper
 
     @staticmethod
-    def sanitize_group_headers(headers_str):
+    def sanitize_group_headers(headers_str, delimiter=',') -> list:
         """
         Sanitizes group header string so that it is easily parsable by enforcer
         removes extra spaces, and converts comma delimited or white space
         delimited list into a list.
+
+        Default delimiter: "," (comma)
+
         Returns:
-            str
+            list
         """
-        # If there are commas and white space in the string,
-        # remove the whitespace
-        if " " in headers_str and "," in headers_str:
-            headers_str = headers_str.replace(" ", "")
-        # If there are no commas in the string, return a list
-        # delimited by whitespace
-        if " " in headers_str and "," not in headers_str:
-            return headers_str.split(" ")
-        # There are commas and no whitespace in the string, return a list
-        # delimited by commas
-        else:
-            return headers_str.split(",")
+
+        return [string.strip() for string in headers_str.split(delimiter) if string != ""]
 
     def manager(self, func):
         """Get the Casbin Enforcer Object to manager Casbin"""

@@ -59,7 +59,7 @@ def watcher():
         ("X-Idp-Groups", "admin", "GET", 401, "X-User"),
         ("X-Idp-Groups", "users", "GET", 200, None),
         ("X-Idp-Groups", "noexist,testnoexist,users", "GET", 200, None),
-        ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
+        # ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
         ("X-Idp-Groups", "noexist, testnoexist, users", "GET", 200, None),
         ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
         ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGl0eSI6ImJvYiJ9."
@@ -205,3 +205,33 @@ def test_enforcer_with_owner_loader(app_fixture, enforcer, owner, method, status
     caller = getattr(c, method.lower())
     rv = caller("/item")
     assert rv.status_code == status
+
+
+@pytest.mark.parametrize(
+    "header_string, expected_list",
+    [
+        ("noexist,testnoexist,users  ", ["noexist", "testnoexist", "users"]),
+        ("noexist,   testnoexist,   users", ["noexist", "testnoexist", "users"]),
+        ("noexist, testnoexist, users", ["noexist", "testnoexist", "users"]),
+        ("somegroup, group with space", ["somegroup", "group with space"]),
+        ("group with space", ["group with space"])
+    ]
+)
+def test_sanitize_group_headers(header_string, expected_list):
+    header_list = CasbinEnforcer.sanitize_group_headers(header_string)
+    assert header_list == expected_list
+
+
+@pytest.mark.parametrize(
+    "header_string, expected_list",
+    [
+        ("noexist testnoexist users  ", ["noexist", "testnoexist", "users"]),
+        ("noexist   testnoexist   users", ["noexist", "testnoexist", "users"]),
+        ("noexist, testnoexist, users", ["noexist,", "testnoexist,", "users"]),
+        ("somegroup, group with space", ["somegroup,", "group", "with", "space"]),
+        ("group with space", ["group", "with", "space"])
+    ]
+)
+def test_sanitize_group_headers_with_whitespace(header_string, expected_list):
+    header_list = CasbinEnforcer.sanitize_group_headers(header_string, ' ')
+    assert header_list == expected_list
