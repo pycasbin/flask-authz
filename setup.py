@@ -1,5 +1,6 @@
-from setuptools import setup, find_packages, __version__
+from setuptools import setup, find_packages
 from os import path
+import configparser
 
 desc_file = "README.md"
 
@@ -18,6 +19,12 @@ dependency_links = [
     x.strip().replace("git+", "") for x in all_reqs if x.startswith("git+")
 ]
 
+# get current version for download_url
+config = configparser.RawConfigParser()
+config.read('setup.cfg')
+download_v = dict(config.items('metadata')).get("version")
+
+
 setup(
     name="flask-authz",
     description="An authorization middleware for Flask that supports ACL, RBAC, ABAC, based on Casbin",
@@ -26,7 +33,7 @@ setup(
     author=["Yang Luo", "Sciencelogic"],
     author_email="hsluoyz@gmail.com",
     url="https://github.com/pycasbin/flask-authz",
-    download_url="https://github.com/pycasbin/flask-authz/tarball/" + __version__,
+    download_url="https://github.com/pycasbin/flask-authz/tarball/v" + download_v,
     license="Apache 2.0",
     python_requires=">=3.5",
     classifiers=[
