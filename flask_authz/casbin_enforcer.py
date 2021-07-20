@@ -5,6 +5,7 @@ from flask import request, jsonify
 from functools import wraps
 from abc import ABC
 from abc import abstractmethod
+import shlex
 
 from flask_authz.utils import authorization_decoder, UnSupportedAuthType
 
@@ -161,7 +162,9 @@ class CasbinEnforcer:
         Returns:
             list
         """
-
+        if delimiter == ' ' and ((headers_str.startswith("'") and headers_str.endswith("'")) or (
+                headers_str.startswith('"') and headers_str.endswith('"'))):
+            return [string.strip() for string in shlex.split(headers_str) if string != ""]
         return [string.strip() for string in headers_str.split(delimiter) if string != ""]
 
     def manager(self, func):
