@@ -149,21 +149,6 @@ def test_enforcer_with_watcher(
     assert rv.status_code == status
 
 
-@pytest.mark.parametrize(
-    "header_string, expected_list",
-    [
-        ("noexist,testnoexist,users  ", ["noexist", "testnoexist", "users"]),
-        ("noexist testnoexist users", ["noexist", "testnoexist", "users"]),
-        ("noexist, testnoexist, users", ["noexist", "testnoexist", "users"]),
-        ("somegroup, group with space", ["somegroup", "group with space"]),
-        ("group with space", ["group with space"])
-    ]
-)
-def test_sanitize_group_headers(header_string, expected_list):
-    header_list = CasbinEnforcer.sanitize_group_headers(header_string)
-    assert header_list == expected_list
-
-
 def test_manager(app_fixture, enforcer):
     @app_fixture.route("/manager", methods=["POST"])
     @enforcer.manager
