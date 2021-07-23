@@ -25,6 +25,7 @@ def enforcer(app_fixture):
     s.add(CasbinRule(ptype="p", v0="data2_admin", v1="/item", v2="GET"))
     s.add(CasbinRule(ptype="g", v0="alice", v1="data2_admin"))
     s.add(CasbinRule(ptype="g", v0="users", v1="data2_admin"))
+    s.add(CasbinRule(ptype="g", v0="group with space", v1="data2_admin"))
     s.commit()
     s.close()
 
@@ -57,10 +58,12 @@ def watcher():
         ("X-User", "bob", "POST", 401, None),
         ("X-User", "bob", "DELETE", 401, None),
         ("X-Idp-Groups", "admin", "GET", 401, "X-User"),
-        ("X-Idp-Groups", "users", "GET", 200, None),
+        ("X-Idp-Groups", "group with space, users", "GET", 200, None),
         ("X-Idp-Groups", "noexist,testnoexist,users", "GET", 200, None),
         # ("X-Idp-Groups", "noexist testnoexist users", "GET", 200, None),
         ("X-Idp-Groups", "noexist, testnoexist, users", "GET", 200, None),
+        ("X-Idp-Groups", "group with space", "GET", 200, None),
+        ("X-Idp-Groups", "somegroup, group with space", "GET", 200, None),
         ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
         ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGl0eSI6ImJvYiJ9."
                           "LM-CqxAM2MtT2uT3AO69rZ3WJ81nnyMQicizh4oqBwk", "GET", 200, None),
@@ -214,7 +217,8 @@ def test_enforcer_with_owner_loader(app_fixture, enforcer, owner, method, status
         ("noexist,   testnoexist,   users", ["noexist", "testnoexist", "users"]),
         ("noexist, testnoexist, users", ["noexist", "testnoexist", "users"]),
         ("somegroup, group with space", ["somegroup", "group with space"]),
-        ("group with space", ["group with space"])
+        ("group with space", ["group with space"]),
+        ("group 'with, space", ["group 'with", "space"])
     ]
 )
 def test_sanitize_group_headers(header_string, expected_list):
@@ -229,6 +233,13 @@ def test_sanitize_group_headers(header_string, expected_list):
         ("noexist   testnoexist   users", ["noexist", "testnoexist", "users"]),
         ("noexist, testnoexist, users", ["noexist,", "testnoexist,", "users"]),
         ("somegroup, group with space", ["somegroup,", "group", "with", "space"]),
+        ('"agroup" "delimited by" "spaces"', ["agroup", "delimited by", "spaces"]),
+        ("'agroup' 'delimited by' 'spaces'", ["agroup", "delimited by", "spaces"]),
+        ("group'with space", ["group'with", "space"]),
+        ("group' with space", ["group'", "with", "space"]),
+        ("'group with' space", ["'group", "with'", "space"]),  # quotes must be used on all groups, not only in 1
+        ('"group with space"', ["group with space"]),
+        ("'group with space'", ["group with space"]),
         ("group with space", ["group", "with", "space"])
     ]
 )
