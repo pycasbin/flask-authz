@@ -40,6 +40,20 @@ jobs:
           COVERALLS_FLAG_NAME: ${{ matrix.os }} - ${{ matrix.python-version }}
           COVERALLS_PARALLEL: true
 
+  lint:
+    name: Run Linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Super-Linter
+        uses: github/super-linter@v4.2.2
+        env:
+          VALIDATE_PYTHON_BLACK: true
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   coveralls:
     name: Indicate completion to coveralls.io
     needs: test
