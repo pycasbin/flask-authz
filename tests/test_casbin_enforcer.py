@@ -65,11 +65,23 @@ def watcher():
         ("X-Idp-Groups", "group with space", "GET", 200, None),
         ("X-Idp-Groups", "somegroup, group with space", "GET", 200, None),
         ("Authorization", "Basic Ym9iOnBhc3N3b3Jk", "GET", 200, "Authorization"),
-        ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGl0eSI6ImJvYiJ9."
-                          "LM-CqxAM2MtT2uT3AO69rZ3WJ81nnyMQicizh4oqBwk", "GET", 200, None),
-        ("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
-                          "eyJleHAiOjE2MTUxMDg0OTIuNTY5MjksImlkZW50aXR5IjoiQm9iIn0."
-                          "CAeMpG-gKbucHU7-KMiqM7H_gTkHSRvXSjNtlvh5DlE", "GET", 401, None),
+        (
+            "Authorization",
+            "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZGVudGl0eSI6ImJvYiJ9."
+            "LM-CqxAM2MtT2uT3AO69rZ3WJ81nnyMQicizh4oqBwk",
+            "GET",
+            200,
+            None,
+        ),
+        (
+            "Authorization",
+            "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."
+            "eyJleHAiOjE2MTUxMDg0OTIuNTY5MjksImlkZW50aXR5IjoiQm9iIn0."
+            "CAeMpG-gKbucHU7-KMiqM7H_gTkHSRvXSjNtlvh5DlE",
+            "GET",
+            401,
+            None,
+        ),
         ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),
         ("Authorization", "Unsupported Ym9iOnBhc3N3b3Jk", "GET", 401, None),
     ],
@@ -218,8 +230,8 @@ def test_enforcer_with_owner_loader(app_fixture, enforcer, owner, method, status
         ("noexist, testnoexist, users", ["noexist", "testnoexist", "users"]),
         ("somegroup, group with space", ["somegroup", "group with space"]),
         ("group with space", ["group with space"]),
-        ("group 'with, space", ["group 'with", "space"])
-    ]
+        ("group 'with, space", ["group 'with", "space"]),
+    ],
 )
 def test_sanitize_group_headers(header_string, expected_list):
     header_list = CasbinEnforcer.sanitize_group_headers(header_string)
@@ -237,12 +249,15 @@ def test_sanitize_group_headers(header_string, expected_list):
         ("'agroup' 'delimited by' 'spaces'", ["agroup", "delimited by", "spaces"]),
         ("group'with space", ["group'with", "space"]),
         ("group' with space", ["group'", "with", "space"]),
-        ("'group with' space", ["'group", "with'", "space"]),  # quotes must be used on all groups, not only in 1
+        (
+            "'group with' space",
+            ["'group", "with'", "space"],
+        ),  # quotes must be used on all groups, not only in 1
         ('"group with space"', ["group with space"]),
         ("'group with space'", ["group with space"]),
-        ("group with space", ["group", "with", "space"])
-    ]
+        ("group with space", ["group", "with", "space"]),
+    ],
 )
 def test_sanitize_group_headers_with_whitespace(header_string, expected_list):
-    header_list = CasbinEnforcer.sanitize_group_headers(header_string, ' ')
+    header_list = CasbinEnforcer.sanitize_group_headers(header_string, " ")
     assert header_list == expected_list

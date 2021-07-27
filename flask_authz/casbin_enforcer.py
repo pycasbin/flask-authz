@@ -60,7 +60,7 @@ class CasbinEnforcer:
         self._owner_loader = callback
         return callback
 
-    def enforcer(self, func, delimiter=','):
+    def enforcer(self, func, delimiter=","):
         @wraps(func)
         def wrapper(*args, **kwargs):
             if self.e.watcher and self.e.watcher.should_reload():
@@ -80,9 +80,7 @@ class CasbinEnforcer:
                 self.app.logger.info("Get owner from owner_loader")
                 for owner in self._owner_loader():
                     owner = owner.strip('"') if isinstance(owner, str) else owner
-                    if self.e.enforce(
-                            owner, uri, request.method
-                    ):
+                    if self.e.enforce(owner, uri, request.method):
                         return func(*args, **kwargs)
             for header in map(str.lower, self.app.config.get("CASBIN_OWNER_HEADERS")):
                 if header in request.headers:
@@ -90,7 +88,9 @@ class CasbinEnforcer:
                     if header == "authorization":
                         # Get Auth Value then decode and parse for owner
                         try:
-                            owner = authorization_decoder(self.app.config, request.headers.get(header))
+                            owner = authorization_decoder(
+                                self.app.config, request.headers.get(header)
+                            )
                         except UnSupportedAuthType:
                             # Continue if catch unsupported type in the event of
                             # Other headers needing to be checked
@@ -103,14 +103,19 @@ class CasbinEnforcer:
                             self.app.logger.info(e)
                             continue
 
-                        if self.user_name_headers and header in map(str.lower, self.user_name_headers):
+                        if self.user_name_headers and header in map(
+                            str.lower, self.user_name_headers
+                        ):
                             owner_audit = owner
                         if self.e.enforce(owner, uri, request.method):
                             self.app.logger.info(
-                                "access granted: method: %s resource: %s%s" % (
+                                "access granted: method: %s resource: %s%s"
+                                % (
                                     request.method,
                                     uri,
-                                    "" if not self.user_name_headers and owner_audit != "" else " to user: %s" % owner_audit
+                                    ""
+                                    if not self.user_name_headers and owner_audit != ""
+                                    else " to user: %s" % owner_audit,
                                 )
                             )
                             return func(*args, **kwargs)
@@ -118,32 +123,38 @@ class CasbinEnforcer:
                         # Split header by ',' in case of groups when groups are
                         # sent "group1,group2,group3,..." in the header
                         for owner in self.sanitize_group_headers(
-                            request.headers.get(header),
-                            delimiter
+                            request.headers.get(header), delimiter
                         ):
                             self.app.logger.debug(
                                 "Enforce against owner: %s header: %s"
                                 % (owner.strip('"'), header)
                             )
-                            if self.user_name_headers and header in map(str.lower, self.user_name_headers):
-                                owner_audit = owner
-                            if self.e.enforce(
-                                owner.strip('"'), uri, request.method
+                            if self.user_name_headers and header in map(
+                                str.lower, self.user_name_headers
                             ):
+                                owner_audit = owner
+                            if self.e.enforce(owner.strip('"'), uri, request.method):
                                 self.app.logger.info(
-                                    "access granted: method: %s resource: %s%s" % (
+                                    "access granted: method: %s resource: %s%s"
+                                    % (
                                         request.method,
                                         uri,
-                                        "" if not self.user_name_headers and owner_audit != "" else " to user: %s" % owner_audit
+                                        ""
+                                        if not self.user_name_headers
+                                        and owner_audit != ""
+                                        else " to user: %s" % owner_audit,
                                     )
                                 )
                                 return func(*args, **kwargs)
             else:
                 self.app.logger.error(
-                    "Unauthorized attempt: method: %s resource: %s%s" % (
+                    "Unauthorized attempt: method: %s resource: %s%s"
+                    % (
                         request.method,
                         uri,
-                        "" if not self.user_name_headers and owner_audit != "" else " by user: %s" % owner_audit
+                        ""
+                        if not self.user_name_headers and owner_audit != ""
+                        else " by user: %s" % owner_audit,
                     )
                 )
                 return (jsonify({"message": "Unauthorized"}), 401)
@@ -151,7 +162,7 @@ class CasbinEnforcer:
         return wrapper
 
     @staticmethod
-    def sanitize_group_headers(headers_str, delimiter=',') -> list:
+    def sanitize_group_headers(headers_str, delimiter=",") -> list:
         """
         Sanitizes group header string so that it is easily parsable by enforcer
         removes extra spaces, and converts comma delimited or white space
@@ -162,10 +173,16 @@ class CasbinEnforcer:
         Returns:
             list
         """
-        if delimiter == ' ' and ((headers_str.startswith("'") and headers_str.endswith("'")) or (
-                headers_str.startswith('"') and headers_str.endswith('"'))):
-            return [string.strip() for string in shlex.split(headers_str) if string != ""]
-        return [string.strip() for string in headers_str.split(delimiter) if string != ""]
+        if delimiter == " " and (
+            (headers_str.startswith("'") and headers_str.endswith("'"))
+            or (headers_str.startswith('"') and headers_str.endswith('"'))
+        ):
+            return [
+                string.strip() for string in shlex.split(headers_str) if string != ""
+            ]
+        return [
+            string.strip() for string in headers_str.split(delimiter) if string != ""
+        ]
 
     def manager(self, func):
         """Get the Casbin Enforcer Object to manager Casbin"""
