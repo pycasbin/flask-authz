@@ -1,5 +1,20 @@
 # Semantic Versioning Changelog
 
+# [2.5.0](https://github.com/pycasbin/flask-authz/compare/v2.4.0...v2.5.0) (2022-01-30)
+
+
+### Bug Fixes
+
+* cleanup requirements ([43cc46e](https://github.com/pycasbin/flask-authz/commit/43cc46ec96dca7efd48d47dd35b4e3cc01412475))
+* correct python-version to string instead of float, misleading the ci. ([c0ac1c8](https://github.com/pycasbin/flask-authz/commit/c0ac1c8ee1b16d3acf26a1768294780c619b602b))
+* Specify a fixed version for nodejs in the release ci workflow ([f6268b6](https://github.com/pycasbin/flask-authz/commit/f6268b6fa932658d48b769ffd619f1ac3d252005))
+
+
+### Features
+
+* add python 3.10 to release workflow ([55e090c](https://github.com/pycasbin/flask-authz/commit/55e090c90acbecc0329a795007b2ee2193a21a92))
+* add python 3.9 and 3.10 to ci using focal distribution ([789d93d](https://github.com/pycasbin/flask-authz/commit/789d93d906c4d84ad404a142cb0a0528e6538bc2))
+
 # [2.4.0](https://github.com/pycasbin/flask-authz/compare/v2.3.0...v2.4.0) (2021-07-23)
 
 
