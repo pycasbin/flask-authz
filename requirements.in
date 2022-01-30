@@ -1,3 +1,3 @@
-casbin
-flask~=1.1.2
-PyJWT
+casbin>=1.0.0<2.0.0
+flask>=1.1.0<3.0.0
+PyJWT>=2.0.1
