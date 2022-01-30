@@ -5,7 +5,7 @@ sphinx
 sphinx_rtd_theme
 pytest
 pytest-cov
-casbin_sqlalchemy_adapter==0.3.2
+casbin_sqlalchemy_adapter>=0.3.2
 coverage
 pypi-publisher
 bumpversion
