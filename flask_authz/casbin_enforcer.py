@@ -80,7 +80,7 @@ class CasbinEnforcer:
                 self.app.logger.info("Get owner from owner_loader")
                 for owner in self._owner_loader():
                     owner = owner.strip('"') if isinstance(owner, str) else owner
-                    if self.e.enforce(owner, uri, request.method):
+                    if self.try_enforcer(owner, uri, request.method):
                         return func(*args, **kwargs)
             for header in map(str.lower, self.app.config.get("CASBIN_OWNER_HEADERS")):
                 if header in request.headers:
@@ -107,7 +107,7 @@ class CasbinEnforcer:
                             str.lower, self.user_name_headers
                         ):
                             owner_audit = owner
-                        if self.e.enforce(owner, uri, request.method):
+                        if self.try_enforcer(owner, uri, request.method):
                             self.app.logger.info(
                                 "access granted: method: %s resource: %s%s"
                                 % (
@@ -133,7 +133,7 @@ class CasbinEnforcer:
                                 str.lower, self.user_name_headers
                             ):
                                 owner_audit = owner
-                            if self.e.enforce(owner.strip('"'), uri, request.method):
+                            if self.try_enforcer(owner.strip('"'), uri, request.method):
                                 self.app.logger.info(
                                     "access granted: method: %s resource: %s%s"
                                     % (
@@ -160,6 +160,9 @@ class CasbinEnforcer:
                 return (jsonify({"message": "Unauthorized"}), 401)
 
         return wrapper
+
+    def try_enforcer(self, owner, uri, method):
+        return self.e.enforce(owner, uri, method)
 
     @staticmethod
     def sanitize_group_headers(headers_str, delimiter=",") -> list:
