@@ -1,6 +1,6 @@
 # flask-authz
 
-[![Build Status](https://www.travis-ci.org/pycasbin/flask-authz.svg?branch=master)](https://www.travis-ci.org/pycasbin/flask-authz)
+[![GitHub Action](https://github.com/pycasbin/flask-authz/workflows/build/badge.svg?branch=master)](https://github.com/pycasbin/flask-authz/actions)
 [![Coverage Status](https://coveralls.io/repos/github/pycasbin/flask-authz/badge.svg)](https://coveralls.io/github/pycasbin/flask-authz)
 [![Version](https://img.shields.io/pypi/v/flask-authz.svg)](https://pypi.org/project/flask-authz/)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/flask-authz.svg)](https://pypi.org/project/flask-authz/)
