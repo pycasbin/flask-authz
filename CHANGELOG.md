@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+## [2.5.1](https://github.com/pycasbin/flask-authz/compare/v2.5.0...v2.5.1) (2023-11-19)
+
+
+### Bug Fixes
+
+* fix requirement files ([617a955](https://github.com/pycasbin/flask-authz/commit/617a9550f4fc4362c4a0e296a6aeefca0bc1cb34))
+* update CI script ([4183a17](https://github.com/pycasbin/flask-authz/commit/4183a17781a13ff9dcb0ef8fcf263fd7a242c521))
+
 # [2.5.0](https://github.com/pycasbin/flask-authz/compare/v2.4.0...v2.5.0) (2022-01-30)
 
 
