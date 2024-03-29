@@ -1,5 +1,13 @@
 # Semantic Versioning Changelog
 
+# [2.6.0](https://github.com/pycasbin/flask-authz/compare/v2.5.1...v2.6.0) (2024-03-29)
+
+
+### Features
+
+* update Python version to 3.9+, update CI Python version ([d9031b5](https://github.com/pycasbin/flask-authz/commit/d9031b55b758543870b8dc4fa09efe898db93da3))
+* upgrade CI Node.js version to 20 ([039ac95](https://github.com/pycasbin/flask-authz/commit/039ac95403da29511c303fd86b3a91f37f1ce7c3))
+
 ## [2.5.1](https://github.com/pycasbin/flask-authz/compare/v2.5.0...v2.5.1) (2023-11-19)
 
 
